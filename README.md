@@ -27,14 +27,14 @@
 	"phone": "1234567894",
 	"id": "646cc87d33a2bb532529e2bd",
 	"profileUrl": "localhost:8000/a.jpg",
+	"token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
 	"request": true
 }
 ```
 
-
 2. baseurl/auth/sign-in : (POST)
 
-    body:
+   body:
 
 ```
 {
@@ -53,10 +53,10 @@
     	"phone": "1234567894",
     	"id": "646cc87d33a2bb532529e2bd",
     	"profileUrl": "localhost:8000/a.jpg",
+	"token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
     	"request": true
 }
 ```
-
 
 3. baseurl/user/update/:id : (POST)
    body:
@@ -70,7 +70,8 @@
 	"name": "test_update",
 	"username": "test_update",
 	"phone: "1234567890",
-	"profileUrl": "localhost:8000/a.jpg"
+	"profileUrl": "localhost:8000/a.jpg",
+	"token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
 }
 ```
 
@@ -87,14 +88,14 @@
 }
 ```
 
-
 4. baseurl/user/delete-account/:userId (POST)
 
-    body:
+   body:
 
 ```
 {
-	"password": test
+	"password": test,
+	"token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
 }
 ```
 
