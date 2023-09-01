@@ -10,6 +10,8 @@ router.post('/update/:id', auth, usersController.update);
 
 router.post('/delete-account/:id', auth, usersController.deleteAccount);
 
+router.post('/sign-out/:id', auth, usersController.signOut);
+
 router.post('/generate-questions', auth, questionsController.generateQuestions);
 
 module.exports = router;

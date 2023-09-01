@@ -26,9 +26,6 @@ const userSchema = mongoose.Schema({
     profileUrl: {
         type: String,
         required: false
-    },
-    token: {
-        type: String
     }
 }, {
     // created at and updated at are stored

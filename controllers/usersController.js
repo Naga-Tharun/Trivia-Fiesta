@@ -32,9 +32,6 @@ module.exports.signUp = async function(req, res){
                       expiresIn: "1h",
                     }
                 );
-            
-                // save user token
-                newUser.token = token;
 
                 // save the token
                 const tokenDocument = new Token({
@@ -50,7 +47,7 @@ module.exports.signUp = async function(req, res){
                     phone: newUser.phone,
                     id: newUser._id,
                     profileUrl: newUser.profileUrl,
-                    token: newUser.token,
+                    token: token,
                     request: true
                 });
                 
@@ -72,7 +69,6 @@ module.exports.signUp = async function(req, res){
 
 // sign in the user
 module.exports.signIn = async function(req, res){
-
     try{
         let user = await User.findOne({email: req.body.email});
         
@@ -85,9 +81,6 @@ module.exports.signIn = async function(req, res){
                       expiresIn: "1h",
                     }
                 );
-            
-                // save user token
-                user.token = token;
 
                 // save the token
                 const tokenDocument = new Token({
@@ -103,7 +96,7 @@ module.exports.signIn = async function(req, res){
                     phone: user.phone,
                     id: user._id,
                     profileUrl: user.profileUrl,
-                    token: user.token,
+                    token: token,
                     request: true
                 });
             }
@@ -121,6 +114,21 @@ module.exports.signIn = async function(req, res){
         }
     }
 };
+
+// sign out the user
+module.exports.signOut = async function(req, res){
+    try{
+        await Token.deleteMany({ userId: req.params.id});
+            
+        return res.json({
+            request: true
+        });
+    } catch(err){
+        return res.status(401).json({ 
+            request: false
+        });
+    }
+}
 
 // user profile update
 module.exports.update = function(req, res){
@@ -152,10 +160,8 @@ module.exports.update = function(req, res){
 
 // delete user account
 module.exports.deleteAccount = async function(req, res){
-
-    let user = await User.findById(req.params.id);
-
     try{
+        let user = await User.findById(req.params.id);
         const match = await bcrypt.compare(req.body.password, user.password);
 
         if(match){
