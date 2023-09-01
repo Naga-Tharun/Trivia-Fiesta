@@ -32,7 +32,8 @@
 }
 ```
 
-2. baseurl/auth/sign-in : (POST)
+
+3. baseurl/auth/sign-in : (POST)
 
    body:
 
@@ -58,7 +59,26 @@
 }
 ```
 
-3. baseurl/user/update/:id : (POST)
+
+4. baseurl/user/sign-out/:id : (POST)
+   body:
+
+```
+{
+   	"token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe...."
+}
+```
+
+   Response:
+
+```
+{
+   	"request": true
+}
+```
+
+
+4. baseurl/user/update/:id : (POST)
    body:
    (the previous values are passsed unaltered along with new updates)
    (phone, profileUrl are optional)
@@ -88,9 +108,10 @@
 }
 ```
 
-4. baseurl/user/delete-account/:userId (POST)
 
-   body:
+5. baseurl/user/delete-account/:userId (POST)
+
+    body:
 
 ```
 {
@@ -108,7 +129,8 @@
 ```
 
 
-    5. baseurl/user/generate-questions (POST)
+
+    6. baseurl/user/generate-questions (POST)
 
     body:
 
