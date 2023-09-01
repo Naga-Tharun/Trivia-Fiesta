@@ -106,3 +106,45 @@
 	"request": true
 }
 ```
+
+
+    5. baseurl/user/generate-questions (POST)
+
+    body:
+
+```
+{
+	"token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+	"categories": "songs, movies",
+	"numQuestions": 5
+}
+```
+
+    Response:
+
+```
+[
+    {
+        "category": "songs",
+        "question": "Which song became the fastest music video to reach 1 billion views on YouTube?",
+        "options": [
+            "Gangnam Style",
+            "See You Again",
+            "Despacito",
+            "Shape of You"
+        ],
+        "correct_answer": "Gangnam Style"
+    },
+    {
+        "category": "movies",
+        "question": "Who directed the movie 'Inception'?",
+        "options": [
+            "Christopher Nolan",
+            "Steven Spielberg",
+            "James Cameron",
+            "Quentin Tarantino"
+        ],
+        "correct_answer": "Christopher Nolan"
+    }
+]
+```
