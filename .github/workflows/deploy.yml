@@ -1,0 +1,24 @@
+name: build and deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy NodeJS app
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{secrets.SSH_HOST}} #IP address of the server
+          username: ${{secrets.USERNAME}} 
+          password: ${{secrets.PASSWORD}} 
+          script: |
+            cd Trivia-Fiesta
+            git pull
+            npm i
+            pm2 restart index.js
+            echo 'Process is rebuilt and running'
+            
