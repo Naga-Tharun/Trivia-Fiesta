@@ -2,6 +2,8 @@
 
 ### End Point
 
+### BASEURL: https://trivia-fiesta.nagatharun.me
+
 1. baseurl/auth/sign-up : (POST)
 
     Body: (profileUrl, phone is optional)
