@@ -7,5 +7,6 @@ router.get("/",(req,res)=>{
 
 router.use('/auth', require("./auth"));
 router.use('/user', require("./user"));
+router.use('/single-player', require("./singlePlayer"));
 
 module.exports = router;
