@@ -19,7 +19,6 @@
        "profileUrl": "localhost:8000/a.jpg"
    }
    ```
-
    Response:
 
    ```
@@ -44,7 +43,6 @@
        "password": "test4"
    }
    ```
-
    Response:
 
    ```
@@ -68,7 +66,6 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe...."
    }
    ```
-
    Response:
 
    ```
@@ -91,7 +88,6 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
    }
    ```
-
    Response: (phone and profileUrl will be sent if modified)
 
    ```
@@ -113,7 +109,6 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
    }
    ```
-
    Response:
 
    ```
@@ -132,7 +127,6 @@
        "numQuestions": 5
    }
    ```
-
    Response:
 
    ```
@@ -163,79 +157,101 @@
    ```
 7. baseurl/single-player/generate-questions : (POST)
 
-    Body:
+   Body:
 
-    ```
-    {
-        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
-        "categories": "songs, movies",
-        "numQuestions": 5,
-	    “username”: test,
-	    “userId”: 64f1be92dfe3f9d4f19c73f5
-    }
-    ```
+   ```
+   {
+       "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+       "categories": "songs, movies",
+       "numQuestions": 5,
+       “username”: test,
+       “userId”: 64f1be92dfe3f9d4f19c73f5
+   }
+   ```
+   Response:
 
-    Response:
-
-    ```
-    {
-        ”gameId": "6551caf8f03b662fd9defbbb",
-        "questions": [
-            {
-                "category": "Cars",
-                "question": "Which car company produces the iconic Mustang?",
-                "options": [
-                    "Ford",
-                    "Chevrolet",
-                    "Dodge",
-                    "Tesla"
-                ],
-                "correct_answer": "Ford"
-            },
-            {
-                "category": "Adventure",
-                "question": "What is the highest mountain in the world?",
-                "options": [
-                    "Mount Everest",
-                    "Mount Kilimanjaro",
-                    "Matterhorn",
-                    "K2"
-                ],
-                "correct_answer": "Mount Everest"
-            },
-            {
-                "category": "Cars",
-                "question": "Which car brand has a logo featuring four linked rings?",
-                "options": [
-                    "Audi",
-                    "BMW",
-                    "Mercedes-Benz",
-                    "Lamborghini"
-                ],
-                "correct_answer": "Audi"
-            }
-        ]
-    }
-    ```
-
-
+   ```
+   {
+       ”gameId": "6551caf8f03b662fd9defbbb",
+       "questions": [
+           {
+               "category": "Cars",
+               "question": "Which car company produces the iconic Mustang?",
+               "options": [
+                   "Ford",
+                   "Chevrolet",
+                   "Dodge",
+                   "Tesla"
+               ],
+               "correct_answer": "Ford"
+           },
+           {
+               "category": "Adventure",
+               "question": "What is the highest mountain in the world?",
+               "options": [
+                   "Mount Everest",
+                   "Mount Kilimanjaro",
+                   "Matterhorn",
+                   "K2"
+               ],
+               "correct_answer": "Mount Everest"
+           },
+           {
+               "category": "Cars",
+               "question": "Which car brand has a logo featuring four linked rings?",
+               "options": [
+                   "Audi",
+                   "BMW",
+                   "Mercedes-Benz",
+                   "Lamborghini"
+               ],
+               "correct_answer": "Audi"
+           }
+       ]
+   }
+   ```
 8. baseurl/single-player/update-score : (POST)
 
-    Body:
+   Body:
 
-    ```
-    {
-        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
-        “gameId”: 6551c71ea445d8beb510fe15,
-        "score”: 5,
-	    “userId”: 64f1be92dfe3f9d4f19c73f5
-    }
-    ```
+   ```
+   {
+       "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+       “gameId”: 6551c71ea445d8beb510fe15,
+       "score”: 5,
+       “userId”: 64f1be92dfe3f9d4f19c73f5
+   }
+   ```
+   Response:
 
-    Response:
+   ```
+   {
+       "message": "Score updated successfully"
+   }
+   ```
+9. baseurl/single-player/ger-scores : (POST)
 
-    ```
-    {
-        "message": "Score updated successfully"
-    }
-    ```
+   Body:
+
+   ```
+   {
+       "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+       “userId”: 64f1be92dfe3f9d4f19c73f5
+   }
+   ```
+   Response:
+
+   ```
+   [
+       {
+           "_id": "6551c71ea445d8beb510fe15",
+           "score": 35,
+           "timestamp": "2023-11-13T06:50:06.591Z"
+       },
+       {
+           "_id": "6551caf8f03b662fd9defbbb",
+           "score": 0,
+           "timestamp": "2023-11-13T07:06:32.052Z"
+       }
+
+   ```

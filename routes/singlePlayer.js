@@ -9,4 +9,6 @@ router.post('/generate-questions', auth, singlePlayersController.generateQuestio
 
 router.post('/update-score', auth, singlePlayersController.updateScore);
 
+router.post('/get-scores', auth, singlePlayersController.getScores);
+
 module.exports = router;

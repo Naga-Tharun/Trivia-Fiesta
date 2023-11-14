@@ -140,3 +140,24 @@ module.exports.updateScore = async function(req, res){
         });
 	}
 }
+
+// Provide game scores of the given user
+module.exports.getScores = async function(req, res) {
+	try {
+		const { userId } = req.body;
+
+        // find the SinglePlayerScore entry by gameId
+        const scores = await SinglePlayerScore.find({ userId }).select('-createdAt -updatedAt -username -userId -__v');
+		console.log(scores);
+
+        return res.json(scores);
+
+	} catch (error) {
+		console.error('Error:', error);
+		
+		return res.status(500).send({
+            message: false
+        });
+	}
+}
+
