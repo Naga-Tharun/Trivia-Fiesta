@@ -19,6 +19,7 @@
        "profileUrl": "localhost:8000/a.jpg"
    }
    ```
+
    Response:
 
    ```
@@ -43,6 +44,7 @@
        "password": "test4"
    }
    ```
+
    Response:
 
    ```
@@ -66,6 +68,7 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe...."
    }
    ```
+
    Response:
 
    ```
@@ -88,6 +91,7 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
    }
    ```
+
    Response: (phone and profileUrl will be sent if modified)
 
    ```
@@ -109,6 +113,7 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
    }
    ```
+
    Response:
 
    ```
@@ -127,6 +132,7 @@
        "numQuestions": 5
    }
    ```
+
    Response:
 
    ```
@@ -168,6 +174,7 @@
        “userId”: 64f1be92dfe3f9d4f19c73f5
    }
    ```
+
    Response:
 
    ```
@@ -222,6 +229,7 @@
        “userId”: 64f1be92dfe3f9d4f19c73f5
    }
    ```
+
    Response:
 
    ```
@@ -229,7 +237,7 @@
        "message": "Score updated successfully"
    }
    ```
-9. baseurl/single-player/ger-scores : (POST)
+9. baseurl/single-player/get-scores : (POST)
 
    Body:
 
@@ -239,6 +247,7 @@
        “userId”: 64f1be92dfe3f9d4f19c73f5
    }
    ```
+
    Response:
 
    ```
@@ -253,5 +262,33 @@
            "score": 0,
            "timestamp": "2023-11-13T07:06:32.052Z"
        }
-
+    ]
    ```
+10. baseurl/multi-player/create-room : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "categories": "songs, movies",
+        “userId”: 64f1be92dfe3f9d4f19c73f5
+    }
+    ```
+
+    Response:
+
+    ```
+    {
+        "roomId": "22883",
+        "creatorId": "64f1be92dfe3f9d4f19c73f5",
+        "participants": [
+            "64f1be92dfe3f9d4f19c73f5"
+        ],
+        "categories": [
+            "Cars, Adventure"
+        ],
+        "_id": "6554559f1a2a9447bbaf5566"
+    }
+
+    ```
