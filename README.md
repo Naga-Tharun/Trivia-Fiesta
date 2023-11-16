@@ -290,5 +290,38 @@
         ],
         "_id": "6554559f1a2a9447bbaf5566"
     }
+    ```
+11. baseurl/multi-player/join-room : (POST)
 
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        “userId”: 64f1be92dfe3f9d4f19c73f5
+    }
+    ```
+
+    Response:
+
+    ```
+    {
+        "message": true,
+        "participants": [
+            {
+                "_id": "64f1be92dfe3f9d4f19c73f5",
+                "email": "test@test.com",
+                "name": "test",
+                "username": "test"
+            },
+            {
+                "_id": "6555ada5e80f53e94325ce09",
+                "email": "test1@test.com",
+                "name": "test1",
+                "username": "test1"
+            }
+        ],
+        "roomId": "06263"
+    }
     ```
