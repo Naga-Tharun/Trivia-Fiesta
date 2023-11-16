@@ -322,6 +322,75 @@
                 "username": "test1"
             }
         ],
-        "roomId": "06263"
+        "categories": [
+            "Cars",
+            "Adventure"
+        ],
+        "roomId": "99395"
+    }
+    ```
+12. baseurl/multi-player/leave-room : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        “userId”: 64f1be92dfe3f9d4f19c73f5
+    }
+    ```
+
+    Response:
+
+    ```
+    {
+        "message": true
+    }
+    ```
+13. baseurl/multi-player/update-categories : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        "chosenCategories": Books, Movies
+    }
+    ```
+
+    Response:
+
+    ```
+    {
+        "categories": [
+            "Cars",
+            "Adventure",
+            "Movies",
+            "Books"
+        ]
+    }
+    ```
+14. baseurl/multi-player/remove-categories : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        "chosenCategories": Books, Movies
+    }
+    ```
+
+    Response:
+
+    ```
+    {
+        "categories": [
+            "Cars",
+            "Adventure"
+        ]
     }
     ```
