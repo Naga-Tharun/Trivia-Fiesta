@@ -394,3 +394,27 @@
         ]
     }
     ```
+15. baseurl/multi-player/player-ready-status : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        "userId": "64f1be92dfe3f9d4f19c73f5"
+        "isReady": "false"
+    }
+    ```
+
+    Response:
+
+    ```
+    {
+        "message": true,
+        "allPlayersReady": false,
+        "playersReadyList": [
+            "test"
+        ]
+    }
+    ```

@@ -20,6 +20,10 @@ const roomSchema = mongoose.Schema({
         type: [String],
         required: true,
     },
+    playersReadyList: [{
+        type: ObjectId,
+        ref: 'User', 
+    }]
     
 }, {
     // created at and updated at are stored

@@ -15,4 +15,6 @@ router.post('/remove-categories', auth, multiPlayersController.removeCategories)
 
 router.post('/leave-room', auth, multiPlayersController.leaveRoom);
 
+router.post('/player-ready-status', auth, multiPlayersController.playerReadyStatus);
+
 module.exports = router;
