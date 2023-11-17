@@ -182,6 +182,8 @@ module.exports.leaveRoom = async function(req, res) {
             return res.status(404).json({ message: false });
         }
 
+        const isUserCreator = room.creatorId.equals(user._id);
+
         // Check if the user is already in the room
         const isUserInRoom = room.participants.some(participant => participant._id.equals(user._id));
 
@@ -192,6 +194,13 @@ module.exports.leaveRoom = async function(req, res) {
         room.participants = room.participants.filter(participant => !participant._id.equals(user._id));
         room.playersReadyList = room.playersReadyList.filter(player => !player._id.equals(user._id));
         await room.save();
+
+        if (isUserCreator && room.participants.length === 0) {
+            await Room.deleteOne({ roomId: roomId });
+            return res.status(200).json({ 
+                message: true 
+            });
+        }
 
         room = await Room.findOne({ roomId: roomId }).populate({
             path: 'participants',
