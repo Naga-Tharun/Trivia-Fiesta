@@ -8,8 +8,8 @@ const https = require('https');
 const fs = require('fs');
 const socketIO = require('socket.io');
 
-const privateKey = fs.readFileSync('privkey.pem', 'utf8');
-const certificate = fs.readFileSync('cert.pem', 'utf8');
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/cert.pem', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 require('dotenv').config();
