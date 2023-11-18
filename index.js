@@ -30,7 +30,7 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const server = https.createServer(credentials);
+const server = https.createServer(credentials, app);
 const io = socketIO(server, {
   cors: {
     origin: '*',
