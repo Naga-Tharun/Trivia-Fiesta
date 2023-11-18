@@ -8,8 +8,8 @@ const https = require('https');
 const fs = require('fs');
 const socketIO = require('socket.io');
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/cert.pem', 'utf8');
+const privateKey = fs.readFileSync('privkey.pem', 'utf8');
+const certificate = fs.readFileSync('cert.pem', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 require('dotenv').config();
@@ -21,7 +21,16 @@ mongoose
   .catch((err) => console.log(err));
 const app = express();
 // app.use(express.json());
-const server = https.createServer(credentials, app);
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+const server = https.createServer(credentials);
 const io = socketIO(server, {
   cors: {
     origin: '*',
@@ -31,18 +40,11 @@ const io = socketIO(server, {
 });
 module.exports = { io };
 const socketPort = process.env.SOCKET_PORT || 8082;
+
 server.listen(socketPort, () => {
   console.log(`server is up and running on ${socketPort}`);
 });
 
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-app.options('*', cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/", require("./routes"));
 
 const auth = require("./middleware/auth");
