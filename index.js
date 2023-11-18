@@ -21,6 +21,16 @@ mongoose
   .catch((err) => console.log(err));
 const app = express();
 // app.use(express.json());
+const server = https.createServer(credentials, app);
+const io = socketIO(server, {
+  path: '/socket.io/',
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  },
+});
+
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST'],
@@ -30,21 +40,7 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const server = https.createServer(credentials, app);
-const io = socketIO(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  },
-});
-
 module.exports = { io };
-const socketPort = process.env.SOCKET_PORT || 8082;
-
-server.listen(socketPort, () => {
-  console.log(`server is up and running on ${socketPort}`);
-});
 
 app.use("/", require("./routes"));
 
@@ -55,6 +51,6 @@ app.post("/welcome", auth, (req, res) => {
 });
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`server is up and running on ${port}`);
 });
