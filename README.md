@@ -413,3 +413,74 @@
     0 {category: "Cars", question: "Which car brand is known for its luxury vehicles?", options: ["Toyota", "Mercedes-Benz", "Honda", "Ford"], correct_answer: "Mercedes-Benz"}
     1 {category: "Adventure", question: "What is the highest mountain in the world?", options: ["Mount Everest", "K2", "Kangchenjunga", "Makalu"], correct_answer: "Mount Everest"}
     ```
+    HTML file for running a http server to test the sockets
+
+    ```
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Socket.IO Example</title>
+      <script src="https://cdn.socket.io/4.3.1/socket.io.js"></script>
+      <script>
+        // Connect to the server
+        const socket = io('https://trivia-fiesta.nagatharun.me/', {
+          transports: ['websocket', 'polling'],
+        }); 
+
+        function joinRoom() {
+          // Get input values
+          const roomId = document.getElementById('roomId').value;
+          const userId = document.getElementById('userId').value;
+
+          // Emit 'joinRoom' event to the server
+          socket.emit('joinRoom', { roomId, userId });
+        }
+
+        function startGame() {
+          // Get input values
+          const roomId = document.getElementById('roomId').value;
+          const userId = document.getElementById('userId').value;
+          const numQuestions = parseInt(document.getElementById('numQuestions').value);
+
+          // Emit 'startGame' event to the server
+          socket.emit('startGame', { roomId, userId, numQuestions });
+        }
+
+        // Listen for 'gameQuestions' event from the server
+        socket.on('gameQuestions', (questions) => {
+          const questionsContainer = document.getElementById('questions');
+          questionsContainer.innerHTML = ''; // Clear previous questions
+
+          console.log(questions);
+
+          questions.forEach((question, index) => {
+            const questionElement = document.createElement('div');
+            questionElement.innerHTML = `<strong>Question ${index + 1}:</strong><br>
+                                          <strong>Category:</strong> ${question.category}<br>
+                                          <strong>Question:</strong> ${question.question}<br>
+                                          <strong>Options:</strong> ${question.options.join(', ')}<br>
+                                          <strong>Correct Answer:</strong> ${question.correct_answer}<br><br>`;
+            questionsContainer.appendChild(questionElement);
+          });
+        });
+      </script>
+    </head>
+    <body>
+      <label for="roomId">Room ID:</label>
+      <input type="text" id="roomId"><br><br>
+
+      <label for="userId">User ID:</label>
+      <input type="text" id="userId"><br><br>
+
+      <label for="numQuestions">Number of Questions:</label>
+      <input type="number" id="numQuestions"><br><br>
+
+      <button onclick="joinRoom()">Join Room</button>
+      <button onclick="startGame()">Start Game</button>
+
+      <div id="questions"></div>
+    </body>
+    </html>
+
+    ```
