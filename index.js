@@ -21,17 +21,14 @@ mongoose
   .catch((err) => console.log(err));
 const app = express();
 // app.use(express.json());
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(cors());
 app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const server = http.createServer(app);
 const io = socketIO(server, {
+  transports: ['websocket', 'polling'],
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],
