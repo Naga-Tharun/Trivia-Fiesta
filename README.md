@@ -413,7 +413,7 @@
     0 {category: "Cars", question: "Which car brand is known for its luxury vehicles?", options: ["Toyota", "Mercedes-Benz", "Honda", "Ford"], correct_answer: "Mercedes-Benz"}
     1 {category: "Adventure", question: "What is the highest mountain in the world?", options: ["Mount Everest", "K2", "Kangchenjunga", "Makalu"], correct_answer: "Mount Everest"}
     ```
-    HTML file for running a http server to test the sockets
+    HTML file for running a http server to test the sockets (run it using `http-server`)
 
     ```
     <!DOCTYPE html>
