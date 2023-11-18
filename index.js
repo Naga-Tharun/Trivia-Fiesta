@@ -4,13 +4,13 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt")
 
-const https = require('https');
-const fs = require('fs');
+const http = require('http');
+// const fs = require('fs');
 const socketIO = require('socket.io');
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/cert.pem', 'utf8');
-const credentials = { key: privateKey, cert: certificate };
+// const privateKey = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/privkey.pem', 'utf8');
+// const certificate = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/cert.pem', 'utf8');
+// const credentials = { key: privateKey, cert: certificate };
 
 require('dotenv').config();
 
@@ -30,7 +30,7 @@ app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const server = https.createServer(credentials, app);
+const server = http.createServer(app);
 const io = socketIO(server, {
   cors: {
     origin: '*',
