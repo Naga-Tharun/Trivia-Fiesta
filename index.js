@@ -38,7 +38,7 @@ const io = socketIO(server, {
     allowedHeaders: ['Content-Type', 'Authorization'],
   },
 });
-io.origins('*:*')
+
 module.exports = { io };
 const socketPort = process.env.SOCKET_PORT || 8082;
 
