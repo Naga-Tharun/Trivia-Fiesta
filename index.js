@@ -30,6 +30,11 @@ const io = socketIO(server, {
   },
 });
 module.exports = { io };
+const socketPort = process.env.SOCKET_PORT || 4000;
+server.listen(socketPort, () => {
+  console.log(`server is up and running on ${socketPort}`);
+});
+
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST'],
@@ -47,6 +52,6 @@ app.post("/welcome", auth, (req, res) => {
 });
 
 const port = process.env.PORT || 4000;
-server.listen(port, () => {
+app.listen(port, () => {
   console.log(`server is up and running on ${port}`);
 });
