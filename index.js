@@ -4,6 +4,14 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt")
 
+const https = require('https');
+const fs = require('fs');
+const socketIO = require('socket.io');
+
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/trivia-fiesta.nagatharun.me/cert.pem', 'utf8');
+const credentials = { key: privateKey, cert: certificate };
+
 require('dotenv').config();
 
 mongoose.set('strictQuery', true);
@@ -13,7 +21,21 @@ mongoose
   .catch((err) => console.log(err));
 const app = express();
 // app.use(express.json());
-app.use(cors());
+const server = https.createServer(credentials, app);
+const io = socketIO(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  },
+});
+module.exports = { io };
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
+app.options('*', cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/", require("./routes"));
@@ -25,6 +47,6 @@ app.post("/welcome", auth, (req, res) => {
 });
 
 const port = process.env.PORT || 4000;
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`server is up and running on ${port}`);
 });

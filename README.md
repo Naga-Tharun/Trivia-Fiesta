@@ -19,7 +19,6 @@
        "profileUrl": "localhost:8000/a.jpg"
    }
    ```
-
    Response:
 
    ```
@@ -44,7 +43,6 @@
        "password": "test4"
    }
    ```
-
    Response:
 
    ```
@@ -68,7 +66,6 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe...."
    }
    ```
-
    Response:
 
    ```
@@ -91,7 +88,6 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
    }
    ```
-
    Response: (phone and profileUrl will be sent if modified)
 
    ```
@@ -113,7 +109,6 @@
        "token": "eewfsiuheufidjwiodjwfirjfuwhudhoijwe....",
    }
    ```
-
    Response:
 
    ```
@@ -132,7 +127,6 @@
        "numQuestions": 5
    }
    ```
-
    Response:
 
    ```
@@ -174,7 +168,6 @@
        “userId”: 64f1be92dfe3f9d4f19c73f5
    }
    ```
-
    Response:
 
    ```
@@ -229,7 +222,6 @@
        “userId”: 64f1be92dfe3f9d4f19c73f5
    }
    ```
-
    Response:
 
    ```
@@ -247,7 +239,6 @@
        “userId”: 64f1be92dfe3f9d4f19c73f5
    }
    ```
-
    Response:
 
    ```
@@ -275,7 +266,6 @@
         “userId”: 64f1be92dfe3f9d4f19c73f5
     }
     ```
-
     Response:
 
     ```
@@ -302,7 +292,6 @@
         “userId”: 64f1be92dfe3f9d4f19c73f5
     }
     ```
-
     Response:
 
     ```
@@ -340,7 +329,6 @@
         “userId”: 64f1be92dfe3f9d4f19c73f5
     }
     ```
-
     Response:
 
     ```
@@ -359,7 +347,6 @@
         "chosenCategories": Books, Movies
     }
     ```
-
     Response:
 
     ```
@@ -383,7 +370,6 @@
         "chosenCategories": Books, Movies
     }
     ```
-
     Response:
 
     ```
@@ -406,7 +392,6 @@
         "isReady": "false"
     }
     ```
-
     Response:
 
     ```
@@ -417,4 +402,14 @@
             "test"
         ]
     }
+    ```
+16. Sockets are created for `disconnect`, `joinRoom`, `startGame`
+
+    1. joinRoom requires: userId, roomId does not emit any response
+    2. startGame requires: userId, roomId, numQuestions emits the questions for the game in the form of an array
+
+    ```
+    Array (2)
+    0 {category: "Cars", question: "Which car brand is known for its luxury vehicles?", options: ["Toyota", "Mercedes-Benz", "Honda", "Ford"], correct_answer: "Mercedes-Benz"}
+    1 {category: "Adventure", question: "What is the highest mountain in the world?", options: ["Mount Everest", "K2", "Kangchenjunga", "Makalu"], correct_answer: "Mount Everest"}
     ```
