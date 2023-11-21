@@ -7,6 +7,7 @@ const nanoid = customAlphabet('1234567890', 5)
 const Question = require("../models/question");
 const Room = require("../models/room");
 const User = require("../models/user");
+const MultiPlayerScore = require("../models/multiPlayerScore");
 
 const { io } = require('../index'); // Import `io` from `index.js`
 
@@ -391,6 +392,25 @@ io.on('connection', (socket) => {
                 return socket.emit('gameError', { error: 'User is not the room creator' });
             }
 
+            // Create a new MultiPlayerScore record
+            const participants = room.participants;
+            const scores = [];
+
+            for (const participant of participants) {
+                scores.push({
+                    userId: participant._id,
+                    score: 0,
+                });
+            }
+
+            const newMultiPlayerScore = new MultiPlayerScore({
+                roomId: roomId,
+                scores: scores,
+            });
+
+            // Save the new MultiPlayerScore document to the database
+            await newMultiPlayerScore.save();
+
             // Get socket IDs of participants in the room
             const socketsInRoom = roomsParticipantsSockets[roomId] ? Object.values(roomsParticipantsSockets[roomId]) : [];
 
@@ -464,3 +484,106 @@ io.on('connection', (socket) => {
         }
     });
 });
+
+// update scores of a player of respective room 
+module.exports.updateScore = async function(req, res){
+    const { roomId, userId, score } = req.body;
+
+    if (!roomId || !userId || !score) {
+        return res.status(400).send({ 
+            message: false
+        });
+    }
+
+    try {
+        const multiPlayerScore = await MultiPlayerScore.findOne({ roomId });
+
+        if (!multiPlayerScore) {
+            return res.status(404).send({ 
+                message: false 
+            });
+        }
+
+        const userScoreIndex = multiPlayerScore.scores.findIndex((scoreObj) => scoreObj.userId.toString() === userId);
+
+        if (userScoreIndex === -1) {
+            multiPlayerScore.scores.push({
+                userId,
+                score,
+            });
+        } else {
+            multiPlayerScore.scores[userScoreIndex].score = score;
+        }
+
+        await multiPlayerScore.save();
+
+        return res.status(200).send({ 
+            message: true 
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send({ 
+            message: false 
+        });
+    }
+}
+
+// calculate the winner and return final scores of the room
+module.exports.finalResult = async function(req, res){
+    const { roomId } = req.body;
+    if (!roomId) {
+        return res.status(400).send({ 
+            message: false
+        });
+    }
+
+    try {
+        const multiPlayerScore = await MultiPlayerScore.findOne({ roomId });
+        multiPlayerScore.populate('scores.userId', 'username');
+
+        if (!multiPlayerScore) {
+            return res.status(404).send({ 
+                message: false 
+            });
+        }
+
+        let highestScore = 0;
+        let winnerId = null;
+
+        for (const scoreObject of multiPlayerScore.scores) {
+            if (scoreObject.score > highestScore) {
+                highestScore = scoreObject.score;
+                winnerId = scoreObject.userId;
+            }
+        }
+
+        multiPlayerScore.winner = winnerId;
+        await multiPlayerScore.save();
+
+        multiPlayerScore.scores.sort((a, b) => b.score - a.score);
+
+        const winnerScoreObject = multiPlayerScore.scores[0];
+        const winnerUsername = winnerScoreObject.userId.username;
+        const winnerScore = winnerScoreObject.score;
+        
+        const simplifiedScores = await multiPlayerScore.scores.map((scoreObject) => ({
+            username: scoreObject.userId.username,
+            score: scoreObject.score,
+        }));
+
+        res.status(200).send({
+            message: true,
+            roomId: multiPlayerScore.roomId,
+            scores: simplifiedScores,
+            winner: {
+                username: winnerUsername,
+                score: winnerScore,
+            },
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send({ 
+            message: false 
+        });
+    }
+}

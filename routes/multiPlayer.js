@@ -17,4 +17,8 @@ router.post('/leave-room', auth, multiPlayersController.leaveRoom);
 
 router.post('/player-ready-status', auth, multiPlayersController.playerReadyStatus);
 
+router.post('/update-score', auth, multiPlayersController.updateScore);
+
+router.post('/final-result', auth, multiPlayersController.finalResult);
+
 module.exports = router;

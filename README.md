@@ -484,3 +484,56 @@
     </html>
 
     ```
+
+17. baseurl/multi-player/update-score : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        "userId": "64f1be92dfe3f9d4f19c73f5"
+        "score": 100
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true
+    }
+    ```
+
+18. baseurl/multi-player/final-result : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 99395,
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true,
+        "roomId": "99395",
+        "scores": [
+            {
+                "username": "test",
+                "score": 100
+            },
+            {
+                "username": "test1",
+                "score": 0
+            }
+        ],
+        "winner": {
+            "username": "test",
+            "score": 100
+        }
+    }
+    ```
