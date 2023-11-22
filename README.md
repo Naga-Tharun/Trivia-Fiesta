@@ -537,3 +537,52 @@
         }
     }
     ```
+
+19. baseurl/multi-player/user-scores : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "userId": 64f1be92dfe3f9d4f19c73f5,
+    }
+    ```
+    Response:
+
+    ```
+    [
+        {
+            "_id": "655c7eff33b354b9078bf9c6",
+            "roomId": "99255",
+            "scores": [
+                {
+                    "username": "test",
+                    "score": 0
+                }
+            ],
+            "winner": {
+                "username": "test",
+                "score": 0
+            }
+        },
+        {
+            "_id": "655c7f4f33b354b9078bf9d2",
+            "roomId": "99395",
+            "scores": [
+                {
+                    "username": "test",
+                    "score": 100
+                },
+                {
+                    "username": "test1",
+                    "score": 200
+                }
+            ],
+            "winner": {
+                "username": "test1",
+                "score": 200
+            }
+        }
+    ]
+    ```

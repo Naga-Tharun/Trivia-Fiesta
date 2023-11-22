@@ -547,8 +547,8 @@ module.exports.finalResult = async function(req, res){
             });
         }
 
-        let highestScore = 0;
-        let winnerId = null;
+        let highestScore = multiPlayerScore.scores[0].score;
+        let winnerId = multiPlayerScore.scores[0].userId;
 
         for (const scoreObject of multiPlayerScore.scores) {
             if (scoreObject.score > highestScore) {
@@ -585,5 +585,50 @@ module.exports.finalResult = async function(req, res){
         return res.status(500).send({ 
             message: false 
         });
+    }
+}
+
+// find the games of given userId to be displayed in scoreboard
+module.exports.userScores = async function(req, res){
+    try {
+        const { userId } = req.body;
+
+        const gamesPlayed = await MultiPlayerScore.find({ 'scores.userId': userId }).select('-createdAt -updatedAt -__v');
+
+        const userIds = gamesPlayed.reduce((allUserIds, game) => {
+            game.scores.forEach((score) => {
+              if (!allUserIds.includes(score.userId)) {
+                allUserIds.push(score.userId);
+              }
+            });
+            return allUserIds;
+        }, []);
+      
+        const users = await User.find({ _id: { $in: userIds } });
+
+        const userMap = users.reduce((map, user) => {
+            map[user._id] = user.username;
+            return map;
+        }, {});
+
+        const gamesWithUsernames = gamesPlayed.map((game) => {
+            const scoresWithUsernames = game.scores.map((score) => ({
+                username: userMap[score.userId],
+                score: score.score,
+            }));
+            const winnerScore = game.scores.reduce((max, score) => (score.score > max ? score.score : max), 0);
+            const winner = {
+                username: userMap[game.winner],
+                score: winnerScore,
+            };
+            return { ...game.toJSON(), scores: scoresWithUsernames, winner };
+        });
+
+        res.status(200).json(gamesWithUsernames);
+    } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+        message: false 
+    });
     }
 }

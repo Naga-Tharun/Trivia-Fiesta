@@ -21,4 +21,6 @@ router.post('/update-score', auth, multiPlayersController.updateScore);
 
 router.post('/final-result', auth, multiPlayersController.finalResult);
 
+router.post('/user-scores', auth, multiPlayersController.userScores);
+
 module.exports = router;
