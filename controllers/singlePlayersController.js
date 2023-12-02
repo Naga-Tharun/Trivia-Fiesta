@@ -19,7 +19,7 @@ module.exports.generateQuestions = async function(req, res){
 
 		var categoriesExist = true;
 
-		for(const i in categories) {
+		for(const i of categories) {
 			const qnFromDb = await Question.find({category: i});
 			if(qnFromDb.length == 0) {
 				categoriesExist = false;
