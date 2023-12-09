@@ -29,7 +29,7 @@ module.exports.signUp = async function(req, res){
                     { user_id: newUser._id, email: newUser.email },
                     process.env.TOKEN_KEY,
                     {
-                      expiresIn: "1h",
+                      expiresIn: 2592000,
                     }
                 );
 
@@ -78,7 +78,7 @@ module.exports.signIn = async function(req, res){
                     { user_id: user._id, email: user.email },
                     process.env.TOKEN_KEY,
                     {
-                      expiresIn: "1h",
+                      expiresIn: 2592000,
                     }
                 );
 
