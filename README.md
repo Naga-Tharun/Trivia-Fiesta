@@ -586,3 +586,225 @@
         }
     ]
     ```
+20. baseurl/team-player/create-room : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        “userId”: 64f1be92dfe3f9d4f19c73f5
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "roomId": "09180",
+        "creatorId": "6555ada5e80f53e94325ce09",
+        "team1": {
+            "leader": "6555ada5e80f53e94325ce09",
+            "players": [
+                "6555ada5e80f53e94325ce09"
+            ],
+            "score": 0
+        },
+        "team2": {
+            "leader": null,
+            "players": [],
+            "score": 0
+        },
+        "categories": null,
+        "availableCategories": null,
+        "currentCategory": null,
+        "isGameStarted": false,
+        "currentTurn": "team1",
+        "_id": "6583e27fdb54c1fbaf8e0de5"
+    }
+    ```
+21. baseurl/team-player/join-room : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 09180,
+        “userId”: 64f1be92dfe3f9d4f19c73f5,
+        "teamChoice": team2
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true,
+        "team1": [
+            {
+                "_id": "6555ada5e80f53e94325ce09",
+                "email": "test1@test.com",
+                "name": "test1",
+                "username": "test1"
+            }
+        ],
+        "team2": [
+            {
+                "_id": "64f1be92dfe3f9d4f19c73f5",
+                "email": "test@test.com",
+                "name": "test",
+                "username": "test"
+            }
+        ],
+        "categories": null,
+        "availableCategories": null,
+        "isGameStarted": false,
+        "currentTurn": "team1",
+        "roomId": "09180"
+    }
+    ```
+22. baseurl/team-player/leave-room : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        “userId”: 64f1be92dfe3f9d4f19c73f5
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true
+    }
+    ```
+23. baseurl/team-player/update-categories : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 09180,
+        "chosenCategories": Books, Movies
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "categories": [
+            "Movies",
+            "Books"
+        ]
+    }
+    ```
+24. Sockets implementation pending for team game mode
+   
+25. baseurl/team-player/update-score : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 01283,
+        "team": team1,
+        "score": 100
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true,
+        "room": {
+            "team1": {
+                "leader": "6555ada5e80f53e94325ce09",
+                "players": [
+                    {
+                        "_id": "6555ada5e80f53e94325ce09",
+                        "email": "test1@test.com",
+                        "name": "test1",
+                        "username": "test1"
+                    }
+                ],
+                "score": 10
+            },
+            "team2": {
+                "leader": "64f1be92dfe3f9d4f19c73f5",
+                "players": [
+                    {
+                        "_id": "64f1be92dfe3f9d4f19c73f5",
+                        "email": "test@test.com",
+                        "name": "test",
+                        "username": "test"
+                    }
+                ],
+                "score": 0
+            },
+            "_id": "6583e27fdb54c1fbaf8e0de5",
+            "roomId": "09180",
+            "creatorId": "6555ada5e80f53e94325ce09",
+            "categories": [
+                "Movies",
+                "Books"
+            ],
+            "availableCategories": [
+                "Movies",
+                "Books"
+            ],
+            "currentCategory": null,
+            "isGameStarted": false,
+            "currentTurn": "team1",
+            "createdAt": "2023-12-21T07:00:15.024Z",
+            "updatedAt": "2023-12-21T07:19:19.640Z",
+            "__v": 2
+        }
+    }
+    ```
+
+26. baseurl/team-player/final-result : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 99395,
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true,
+        "roomId": "09180",
+        "winnerTeam": {
+            "leader": "6555ada5e80f53e94325ce09",
+            "players": [
+                {
+                    "_id": "6555ada5e80f53e94325ce09",
+                    "email": "test1@test.com",
+                    "name": "test1",
+                    "username": "test1"
+                }
+            ],
+            "score": 10
+        },
+        "looserTeam": {
+            "leader": "64f1be92dfe3f9d4f19c73f5",
+            "players": [
+                {
+                    "_id": "64f1be92dfe3f9d4f19c73f5",
+                    "email": "test@test.com",
+                    "name": "test",
+                    "username": "test"
+                }
+            ],
+            "score": 0
+        }
+    }
+    ```
