@@ -9,5 +9,6 @@ router.use('/auth', require("./auth"));
 router.use('/user', require("./user"));
 router.use('/single-player', require("./singlePlayer"));
 router.use('/multi-player', require("./multiPlayer"));
+router.use('/team-player', require("./teamPlayer"));
 
 module.exports = router;
