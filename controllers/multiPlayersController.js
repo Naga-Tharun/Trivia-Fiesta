@@ -352,18 +352,18 @@ io.on('connection', (socket) => {
         // Find and remove the socket from the 'roomsParticipantsSockets' object
         // based on the room and participant key
         const roomId = Object.keys(roomsParticipantsSockets).find(roomId => {
-        const participantKey = Object.keys(roomsParticipantsSockets[roomId]).find(
-            key => roomsParticipantsSockets[roomId][key] === socket.id
-        );
-        if (participantKey) {
-            delete roomsParticipantsSockets[roomId][participantKey];
-            return true;
-        }
-        return false;
+            const participantKey = Object.keys(roomsParticipantsSockets[roomId]).find(
+                key => roomsParticipantsSockets[roomId][key] === socket.id
+            );
+            if (participantKey) {
+                delete roomsParticipantsSockets[roomId][participantKey];
+                return true;
+            }
+            return false;
         });
 
         if (roomId && Object.keys(roomsParticipantsSockets[roomId]).length === 0) {
-        delete roomsParticipantsSockets[roomId];
+            delete roomsParticipantsSockets[roomId];
         }
     });
     

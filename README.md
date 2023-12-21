@@ -701,7 +701,120 @@
         ]
     }
     ```
-24. Sockets implementation pending for team game mode
+24. Sockets are created for `teamDisconnect`, `joinTeamRoom`, `startTeamGame`, `teamCategoryChoice`, `teamQuestionChoice`, `alterTeamTurn`
+
+    HTML file for running a http server to test the sockets (run it using `http-server`)
+
+    ```
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Socket.io Test</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+        <script>
+            const socket = io('http://localhost:8082'); // Replace with your server URL
+            
+            socket.on('connect', () => {
+                console.log('Connected to the server');
+            });
+
+            socket.on('message', (message) => {
+                console.log('Server message:', message);
+            });
+
+            function joinRoom() {
+            // Get input values
+            const roomId = document.getElementById('roomId').value;
+            const userId = document.getElementById('userId').value;
+
+            // Emit 'joinRoom' event to the server
+            socket.emit('joinTeamRoom', { roomId, userId });
+            }
+
+            function startGame() {
+            // Get input values
+            const roomId = document.getElementById('roomId').value;
+            const userId = document.getElementById('userId').value;
+
+            // Emit 'startGame' event to the server
+            socket.emit('startTeamGame', { roomId, userId });
+            }
+
+            socket.on('teamSelectCategory', (categories) => {
+            console.log(categories);
+            });
+
+            socket.on('gameQuestions', (questions) => {
+                console.log('Received game questions:', questions);
+                // Process and display the questions on the UI
+                // Example: Add the questions to a list on the HTML page
+                const questionsList = document.getElementById('questionsList');
+                questionsList.innerHTML = ''; // Clear previous questions
+                questions.forEach((question, index) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Question ${index + 1}: ${question.id}`;
+                    questionsList.appendChild(listItem);
+                });
+            });
+
+            socket.on('Question', (question) => {
+                console.log('Received game question:', question);
+                // Process and display the questions on the UI
+                // Example: Add the questions to a list on the HTML page
+                const questionsList = document.getElementById('questionsList');
+                questionsList.innerHTML = ''; // Clear previous questions
+                const listItem = document.createElement('li');
+                listItem.textContent = `Question ${1}: ${question.question}`;
+                questionsList.appendChild(listItem);
+
+            });
+
+            // Example function to emit a team1CategoryChoice event
+            function chooseCategory() {
+                const category = document.getElementById('categoryInput').value; // Get category from input field
+                const roomId = document.getElementById('roomId').value;
+                console.log(category);
+                socket.emit('teamCategoryChoice', { chosenCategory: category, roomId: roomId });
+            }
+
+            function chooseQuestionId() {
+                const questionId = document.getElementById('questionIdInput').value; // Get category from input field
+                const roomId = document.getElementById('roomId').value;
+                console.log(questionId);
+                socket.emit('teamQuestionChoice', { chosenQuestionId: questionId, roomId: roomId });
+            }
+
+            function alterTurn() {
+                const roomId = document.getElementById('roomId').value; // Get category from input field
+                console.log(roomId);
+                socket.emit('alterTeamTurn', { roomId: roomId });
+            }
+        </script>
+    </head>
+        <body>
+            <h1>Socket.io Test</h1>
+            <label for="roomId">Room ID:</label>
+            <input type="text" id="roomId"><br><br>
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId"><br><br>
+            <button onclick="joinRoom()">Join Room</button>
+            <button onclick="startGame()">Start Game</button>
+
+            <p>Choose a category:</p>
+            <input type="text" id="categoryInput">
+            <button onclick="chooseCategory()">Choose Category</button>
+            <h2>Game Questions:</h2>
+            <ul id="questionsList"></ul>
+            <p>Choose a questionId:</p>
+            <input type="text" id="questionIdInput">
+            <button onclick="chooseQuestionId()">Choose Question Id</button>
+            <br><br>
+            <button onclick="alterTurn()">Alter Turn</button>
+        </body>
+    </html>
+
+    ```
    
 25. baseurl/team-player/update-score : (POST)
 
@@ -806,5 +919,23 @@
             ],
             "score": 0
         }
+    }
+    ```
+27. baseurl/team-player/check-answer : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "questionId": 6527cd1326ad7aaaf8aac6f6,
+        "chosenAnswer": Ed Sheeran
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true,
     }
     ```

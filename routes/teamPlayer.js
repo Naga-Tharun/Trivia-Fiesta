@@ -17,4 +17,6 @@ router.post('/update-score', auth, teamPlayersController.updateScore);
 
 router.post('/final-result', auth, teamPlayersController.finalResult);
 
+router.post('/check-answer', auth, teamPlayersController.checkAnswer);
+
 module.exports = router;

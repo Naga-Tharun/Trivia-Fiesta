@@ -76,6 +76,9 @@ module.exports.joinRoom = async function(req, res) {
         if (!room || !user) {
             return res.status(404).json({ message: false });
         }
+        if (room.isGameStarted) {
+            return res.status(404).json({ message: false });
+        }
 
         // Check if the user is already in the room
         const isInTeam = (team, userId) => team.players.some(player => player.equals(userId));
@@ -270,175 +273,340 @@ function selectRandomQuestions(questions, num, categories) {
 	const selectedQuestions = shuffledQuestions.slice(0, num);
 
 	const formattedQuestions = selectedQuestions.map((question) => ({
+        id: question._id,
 		category: question.category,
 		question: question.question,
 		options: question.options,
 		correct_answer: question.correct_answer,
 	  }));
 
-	console.log(formattedQuestions);
+	// console.log(formattedQuestions);
     return formattedQuestions;
 };
 
-// const roomsParticipantsSockets = {};
+const roomsParticipantsSockets = {};
 
-// // Socket.io connection handling
-// io.on('connection', (socket) => {
-//     console.log('A user connected');
+// Socket.io connection handling
+io.on('connection', (socket) => {
+    console.log('A user connected');
   
-//     // Send a message to the connected client
-//     socket.emit('message', 'Welcome to the server!');
+    // Send a message to the connected client
+    socket.emit('message', 'Welcome to the server!');
 
-//     socket.on('joinRoom', ({ userId, roomId }) => {
-//         // Create a unique key for the participant's room and user
-//         console.log("joined room");
-//         const participantKey = `${roomId}-${userId}`;
+    socket.on('joinTeamRoom', ({ userId, roomId }) => {
+        // Create a unique key for the participant's room and user
+        console.log("joined room");
+        const participantKey = `${roomId}-${userId}`;
         
-//         if (!roomsParticipantsSockets[roomId]) {
-//             roomsParticipantsSockets[roomId] = {};
-//         }
+        if (!roomsParticipantsSockets[roomId]) {
+            roomsParticipantsSockets[roomId] = {};
+        }
             
-//         // Store the socket associated with the participant for the specific room
-//         roomsParticipantsSockets[roomId][participantKey] = socket.id;
-//     });
+        // Store the socket associated with the participant for the specific room
+        roomsParticipantsSockets[roomId][participantKey] = socket.id;
+    });
 
-//     socket.on('disconnect', () => {
-//         console.log('A user disconnected');
-//         // Find and remove the socket from the 'roomsParticipantsSockets' object
-//         // based on the room and participant key
-//         const roomId = Object.keys(roomsParticipantsSockets).find(roomId => {
-//         const participantKey = Object.keys(roomsParticipantsSockets[roomId]).find(
-//             key => roomsParticipantsSockets[roomId][key] === socket.id
-//         );
-//         if (participantKey) {
-//             delete roomsParticipantsSockets[roomId][participantKey];
-//             return true;
-//         }
-//         return false;
-//         });
+    socket.on('teamDisconnect', () => {
+        console.log('A user disconnected');
+        // Find and remove the socket from the 'roomsParticipantsSockets' object
+        // based on the room and participant key
+        const roomId = Object.keys(roomsParticipantsSockets).find(roomId => {
+            const participantKey = Object.keys(roomsParticipantsSockets[roomId]).find(
+                key => roomsParticipantsSockets[roomId][key] === socket.id
+            );
+            if (participantKey) {
+                delete roomsParticipantsSockets[roomId][participantKey];
+                return true;
+            }
+            return false;
+        });
 
-//         if (roomId && Object.keys(roomsParticipantsSockets[roomId]).length === 0) {
-//         delete roomsParticipantsSockets[roomId];
-//         }
-//     });
+        if (roomId && Object.keys(roomsParticipantsSockets[roomId]).length === 0) {
+            delete roomsParticipantsSockets[roomId];
+        }
+    });
     
   
-//     socket.on('startGame', async ({ userId, roomId, numQuestions }) => {
-//         console.log('game stated');
-//         try {
-//             let roomExists = await Room.exists({ roomId });
-//             if (!roomExists) {
-//                 return socket.emit('gameError', { error: 'Room does not exist' });
-//             }
+    socket.on('startTeamGame', async ({ userId, roomId }) => {
+        console.log('game stated');
+        try {
+            let roomExists = await Room.exists({ roomId });
+            if (!roomExists) {
+                return socket.emit('gameError', { error: 'Room does not exist' });
+            }
 
-//             let room = await Room.findOne({ roomId: roomId }).populate('participants', '_id');
-//             const allPlayersReady = room.playersReadyList.length >= room.participants.length;
+            let room = await Room.findOne({ roomId: roomId }).populate({
+                path: 'team1.players',
+                select: '_id username name email'
+            }).populate({
+                path: 'team2.players',
+                select: '_id username name email'
+            });
+
+            let user = await User.findById(userId);
+            if (!user) {
+                return socket.emit('gameError', { error: 'User not found' });
+            }
+            const isUserCreator = room.creatorId.equals(user._id);
+            if (!isUserCreator) {
+                return socket.emit('gameError', { error: 'User is not the room creator' });
+            }
+
+            room.isGameStarted = true;
+            await room.save();
+
+            // Get socket IDs of participants in the room
+            const socketsInRoom = roomsParticipantsSockets[roomId] ? Object.values(roomsParticipantsSockets[roomId]) : [];
+
+            const team1Leader = room.team1.leader;
+            const team2Leader = room.team2.leader;
+
+            let availableCategories = room.availableCategories;
+
+            io.to(roomsParticipantsSockets[roomId][`${roomId}-${team1Leader}`]).emit('teamSelectCategory', { categories: availableCategories });
+        } catch (error) {
+            console.error('Error:', error);
+            return socket.emit('gameError', { error: 'Error starting the game' });
+        }
+    });
+
+    socket.on('teamCategoryChoice', async ({ chosenCategory, roomId }) => {
+        // Here, 'chosenCategory' is the category selected by the team1 leader
+        console.log(`Team selected category: ${chosenCategory}`);
+        const currentCategory = chosenCategory.toString();
+
+        let roomExists = await Room.exists({ roomId });
+        if (!roomExists) {
+            return socket.emit('gameError', { error: 'Room does not exist' });
+        }
+
+        let room = await Room.findOne({ roomId: roomId }).populate({
+            path: 'team1.players',
+            select: '_id username name email'
+        }).populate({
+            path: 'team2.players',
+            select: '_id username name email'
+        });
+
+        room.currentCategory = currentCategory;
+
+        let availableCategories = room.availableCategories;
+
+        room.availableCategories = room.availableCategories.filter(category => category !== currentCategory);
+        availableCategories = availableCategories.filter(category => category !== currentCategory);
+
+        await room.save();
+
+        // Now, generate 3 questions based on this chosen category and emit them to the corresponding team
+        // check if questions of mentioned category are in database
+        try {
+            const questionsFromDatabase = await Question.find({ category: { $in: currentCategory } });
+    
+            var categoriesExist = true;
+
+            const qnFromDb = await Question.find({category: currentCategory});
+            if(qnFromDb.length == 0) {
+                categoriesExist = false;
+            }
+
+            const openai = new OpenAI({
+                apiKey: process.env.OPENAI_APIKEY
+            });
             
-//             if (!allPlayersReady) {
-//                 return socket.emit('gameError', { error: 'Not all players are ready' });
-//             }
+            if (questionsFromDatabase.length < 3 || categoriesExist == false) {
+                const question = "Generate a total of 3 mcqs based on the following categories: " + currentCategory + ' and provide the correct answer for each mcq, represent the mcqs in the following json format [{"category": "value", "question": "question 1", "options": ["option 1", "option 2", "option 3", "option 4"], "correct_answer": "answer"}]. ';
+    
+                const completion = await openai.chat.completions.create({
+                    messages: [
+                    { 
+                        role: 'user',
+                        content: question
+                    }
+                    ],
+                    model: 'gpt-3.5-turbo',
+                });
+    
+                const questionsData = completion.choices[0].message.content;
+                addQuestions(questionsData);
+    
+                const generatedQuestions = JSON.parse(questionsData);
+                const shuffledQuestions = generatedQuestions.sort(() => 0.5 - Math.random());
 
-//             let user = await User.findById(userId);
-//             if (!user) {
-//                 return socket.emit('gameError', { error: 'User not found' });
-//             }
-//             const isUserCreator = room.creatorId.equals(user._id);
-//             if (!isUserCreator) {
-//                 return socket.emit('gameError', { error: 'User is not the room creator' });
-//             }
+                const socketIdsArray = Object.keys(roomsParticipantsSockets[roomId] || {});
+                if (socketIdsArray.length > 0) {
+                    // console.log(selectedQuestions);
+                    // Emit 'gameQuestions' event only to participants in the room
+                    socketIdsArray.forEach(async participantSocket => {
+                        const playerId = participantSocket.split("-")[1];
+                        // console.log(playerId);
 
-//             // Create a new MultiPlayerScore record
-//             const participants = room.participants;
-//             const scores = [];
+                        if(room.currentTurn === "team1") {
+                            const playerInTeam1 = await room.team1.players.find(player => player.equals(playerId));
 
-//             for (const participant of participants) {
-//                 scores.push({
-//                     userId: participant._id,
-//                     score: 0,
-//                 });
-//             }
+                            if (playerInTeam1) {
+                                // console.log(selectedQuestions);
+                                io.to(roomsParticipantsSockets[roomId][participantSocket]).emit('gameQuestions', shuffledQuestions);
+                            }
+                        } else {
+                            const playerInTeam2 = await room.team2.players.find(player => player.equals(playerId));
 
-//             const newMultiPlayerScore = new MultiPlayerScore({
-//                 roomId: roomId,
-//                 scores: scores,
-//             });
+                            if (playerInTeam2) {
+                                // console.log(selectedQuestions);
+                                io.to(roomsParticipantsSockets[roomId][participantSocket]).emit('gameQuestions', shuffledQuestions);
+                            }
+                        }
 
-//             // Save the new MultiPlayerScore document to the database
-//             await newMultiPlayerScore.save();
+                    });
+                } else {
+                    console.log('No participants found in the room');
+                }
+            } 
+            else {
+                // console.log(chosenCategory.split(', '));
+                const selectedQuestions = await selectRandomQuestions(questionsFromDatabase, 3, chosenCategory.split(', '));
+                
+                const socketIdsArray = Object.keys(roomsParticipantsSockets[roomId] || {});
+                if (socketIdsArray.length > 0) {
+                    // console.log(selectedQuestions);
+                    // Emit 'gameQuestions' event only to participants in the room
+                    socketIdsArray.forEach(async participantSocket => {
+                        const playerId = participantSocket.split("-")[1];
+                        // console.log(playerId);
 
-//             // Get socket IDs of participants in the room
-//             const socketsInRoom = roomsParticipantsSockets[roomId] ? Object.values(roomsParticipantsSockets[roomId]) : [];
+                        if(room.currentTurn === "team1") {
+                            const playerInTeam1 = await room.team1.players.find(player => player.equals(playerId));
 
-//             const openai = new OpenAI({
-//                 apiKey: process.env.OPENAI_APIKEY
-//             });
-        
-//             let categories = room.categories;
-//             let categoriesString = categories.join(", ");
-        
-//             // check if questions of mentioned category are in database
-//             try {
-//                 const questionsFromDatabase = await Question.find({ category: { $in: categories } });
-        
-//                 var categoriesExist = true;
-        
-//                 for(const i of categories) {
-//                     const qnFromDb = await Question.find({category: i});
-//                     if(qnFromDb.length == 0) {
-//                         categoriesExist = false;
-//                     }
-//                 }
-        
-//                 if (questionsFromDatabase.length < numQuestions || categoriesExist == false) {
-//                     const question = "Generate a total of " + numQuestions + " mcqs based on the following categories: " + categoriesString + ' and provide the correct answer for each mcq, represent the mcqs in the following json format [{"category": "value", "question": "question 1", "options": ["option 1", "option 2", "option 3", "option 4"], "correct_answer": "answer"}]. ';
-        
-//                     const completion = await openai.chat.completions.create({
-//                         messages: [
-//                         { 
-//                             role: 'user',
-//                             content: question
-//                         }
-//                         ],
-//                         model: 'gpt-3.5-turbo',
-//                     });
-        
-//                     const questionsData = completion.choices[0].message.content;
-//                     addQuestions(questionsData);
-        
-//                     const generatedQuestions = JSON.parse(questionsData);
-//                     const shuffledQuestions = generatedQuestions.sort(() => 0.5 - Math.random());
+                            if (playerInTeam1) {
+                                // console.log(selectedQuestions);
+                                io.to(roomsParticipantsSockets[roomId][participantSocket]).emit('gameQuestions', selectedQuestions);
+                            }
+                        } else {
+                            const playerInTeam2 = await room.team2.players.find(player => player.equals(playerId));
 
-//                     if (socketsInRoom.length > 0) {
-//                         // Emit 'gameQuestions' event only to participants in the room
-//                         socketsInRoom.forEach((participantSocket) => {
-//                             io.to(participantSocket).emit('gameQuestions', shuffledQuestions);
-//                         });
-//                     } else {
-//                         console.log('No participants found in the room');
-//                     }
-//                 } 
-//                 else {
-//                     const selectedQuestions = await selectRandomQuestions(questionsFromDatabase, numQuestions, categories);
+                            if (playerInTeam2) {
+                                // console.log(selectedQuestions);
+                                io.to(roomsParticipantsSockets[roomId][participantSocket]).emit('gameQuestions', selectedQuestions);
+                            }
+                        }
+                    });
+                } else {
+                    console.log('No participants found in the room');
+                }
+            }
+        } catch (error) {
+            console.error('Error checking the database:', error);
+            return socket.emit('gameError', { error: 'Error starting the game' });
+        }
+    });
 
-//                     if (socketsInRoom.length > 0) {
-//                         // Emit 'gameQuestions' event only to participants in the room
-//                         socketsInRoom.forEach(participantSocket => {
-//                             io.to(participantSocket).emit('gameQuestions', selectedQuestions);
-//                         });
-//                     } else {
-//                         console.log('No participants found in the room');
-//                     }
-//                 }
-//             } catch (error) {
-//                 console.error('Error checking the database:', error);
-//                 return socket.emit('gameError', { error: 'Error starting the game' });
-//             }
-//         } catch (error) {
-//             console.error('Error:', error);
-//             return socket.emit('gameError', { error: 'Error starting the game' });
-//         }
-//     });
-// });
+
+    socket.on('teamQuestionChoice', async ({ chosenQuestionId, roomId }) => {
+        console.log(`Team selected question id: ${chosenQuestionId}`);
+
+        let roomExists = await Room.exists({ roomId });
+        if (!roomExists) {
+            return socket.emit('gameError', { error: 'Room does not exist' });
+        }
+
+        let room = await Room.findOne({ roomId: roomId }).populate({
+            path: 'team1.players',
+            select: '_id username name email'
+        }).populate({
+            path: 'team2.players',
+            select: '_id username name email'
+        });
+
+        try {
+            if (!chosenQuestionId) {
+                return res.status(400).send({ 
+                    message: false
+                });
+            }
+    
+            let questionExists = await Question.exists({ chosenQuestionId });
+    
+            if (!questionExists) {
+                return res.status(404).json({ message: false });
+            }
+    
+            let question = await Question.findOne({ _id: chosenQuestionId });
+    
+            if (!question) {
+                return res.status(404).json({ message: false });
+            }
+            
+            const socketIdsArray = Object.keys(roomsParticipantsSockets[roomId] || {});
+            if (socketIdsArray.length > 0) {
+                socketIdsArray.forEach(async participantSocket => {
+                    const playerId = participantSocket.split("-")[1];
+
+                    if(room.currentTurn === "team1") {
+                        const playerInTeam2 = await room.team2.players.find(player => player.equals(playerId));
+
+                        if (playerInTeam2) {
+                            io.to(roomsParticipantsSockets[roomId][participantSocket]).emit('Question', question);
+                        }
+                    } else {
+                        const playerInTeam1 = await room.team1.players.find(player => player.equals(playerId));
+
+                        if (playerInTeam1) {
+                            io.to(roomsParticipantsSockets[roomId][participantSocket]).emit('Question', question);
+                        }
+                    }
+                });
+            } else {
+                console.log('No participants found in the room');
+            }
+            
+        } catch (err) {
+            console.error(err);
+            return socket.emit('gameError', { error: 'Error starting the game' });
+        }
+    });
+
+    socket.on('alterTeamTurn', async ({ roomId }) => {
+        console.log(roomId);
+        if (!roomId) {
+            socket.emit('gameError', { error: 'Error occured' });
+        }
+
+        let roomExists = await Room.exists({ roomId });
+
+        if (!roomExists) {
+            return res.status(404).json({ message: false });
+        }
+
+        let room = await Room.findOne({ roomId: roomId });
+
+        if (!room) {
+            return res.status(404).json({ message: false });
+        }
+
+        console.log(`Current Turn: ${room.currentTurn}`);
+
+        try {
+            if (room.currentTurn === "team1") {
+                room.currentTurn = "team2";
+            } else {
+                room.currentTurn = "team1";
+            }
+
+            room.currentCategory = null;
+
+            await room.save();
+
+            if (room.currentTurn === "team1") {
+                io.to(roomsParticipantsSockets[roomId][`${roomId}-${room.team1.leader}`]).emit('teamSelectCategory', { categories: room.availableCategories });
+            } else {
+                io.to(roomsParticipantsSockets[roomId][`${roomId}-${room.team2.leader}`]).emit('teamSelectCategory', { categories: room.availableCategories });
+            }
+        } catch (err) {
+            console.error(err);
+            return socket.emit('gameError', { error: 'Error during the game' });
+        }
+    });
+
+});
 
 // update scores of a player of respective room 
 module.exports.updateScore = async function(req, res){
@@ -534,6 +702,45 @@ module.exports.finalResult = async function(req, res){
             winnerTeam: winnerTeam,
             looserTeam: looserTeam
         });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send({ 
+            message: false 
+        });
+    }
+}
+
+// endpoint to check if the answer of a question is correct
+module.exports.checkAnswer = async function(req, res){
+    try {
+        const { questionId, chosenAnswer } = req.body;
+        if (!questionId) {
+            return res.status(400).send({ 
+                message: false
+            });
+        }
+
+        let questionExists = await Question.exists({ questionId });
+
+        if (!questionExists) {
+            return res.status(404).json({ message: false });
+        }
+
+        let question = await Question.findOne({ _id: questionId });
+
+        if (!question) {
+            return res.status(404).json({ message: false });
+        }
+        
+        if (chosenAnswer === question.correct_answer) {
+            res.status(200).send({
+                message: true,
+            });
+        } else {    
+            res.status(200).send({
+                message: false,
+            }); 
+        }
     } catch (err) {
         console.error(err);
         return res.status(500).send({ 
