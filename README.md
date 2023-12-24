@@ -825,6 +825,10 @@
 
             });
 
+            socket.on('gameEnded', (message) => {
+                console.log(message);
+            });
+
             // Example function to emit a team1CategoryChoice event
             function chooseCategory() {
                 const category = document.getElementById('categoryInput').value; // Get category from input field

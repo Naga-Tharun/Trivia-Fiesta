@@ -595,7 +595,18 @@ io.on('connection', (socket) => {
 
             await room.save();
 
-            if (room.currentTurn === "team1") {
+            if(room.availableCategories.length === 0) {
+                const socketIdsArray = Object.keys(roomsParticipantsSockets[roomId] || {});
+                if (socketIdsArray.length > 0) {
+                    socketIdsArray.forEach(async participantSocket => {
+                        io.to(roomsParticipantsSockets[roomId][participantSocket]).emit('gameEnded', {message: "Game ended! Load the scores"});   
+                    });
+                } else {
+                    console.log('No participants found in the room');
+                }
+
+            }
+            else if (room.currentTurn === "team1") {
                 io.to(roomsParticipantsSockets[roomId][`${roomId}-${room.team1.leader}`]).emit('teamSelectCategory', { categories: room.availableCategories });
             } else {
                 io.to(roomsParticipantsSockets[roomId][`${roomId}-${room.team2.leader}`]).emit('teamSelectCategory', { categories: room.availableCategories });
