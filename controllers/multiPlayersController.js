@@ -88,6 +88,7 @@ module.exports.joinRoom = async function(req, res) {
 
         return res.status(200).json({
             message: true,
+            creatorId: room.creatorId,
             participants: room.participants,
             categories: room.categories,
             roomId: roomId
@@ -631,4 +632,80 @@ module.exports.userScores = async function(req, res){
         message: false 
     });
     }
+}
+
+// return the details of participants of a room
+module.exports.roomDetails = async function(req, res) {
+    try {
+		const { roomId } = req.body;
+        
+        let roomExists = await Room.exists({ roomId });
+
+        if (!roomExists) {
+            return res.status(404).json({ message: false });
+        }
+
+        let room = await Room.findOne({ roomId: roomId }).populate({
+            path: 'participants',
+            select: '_id username name email'
+        }).populate({
+            path: 'playersReadyList',
+            select: '_id username name email'
+        });
+
+        await room.save();
+
+        return res.status(200).json({
+            message: true,
+            participants: room.participants,
+            categories: room.categories,
+            playersReadyList: room.playersReadyList,
+            roomId: roomId
+        });
+	} catch (error) {
+		console.error('Error:', error);
+		
+		return res.status(500).send({
+            message: false
+        });
+	}
+}
+
+//check if all the players in the room are ready
+module.exports.checkAllPlayerReady = async function(req, res) {
+    try {
+		const { roomId } = req.body;
+        
+        let roomExists = await Room.exists({ roomId });
+
+        if (!roomExists) {
+            return res.status(404).json({ message: false });
+        }
+
+        let room = await Room.findOne({ roomId: roomId }).populate({
+            path: 'participants',
+            select: '_id username name email'
+        }).populate({
+            path: 'playersReadyList',
+            select: '_id username name email'
+        });
+
+        await room.save();
+
+        if (room.participants.length === room.playersReadyList.length) {
+            return res.status(200).json({
+                message: true,
+            });
+        }
+
+        return res.status(200).json({
+            message: false,
+        });
+	} catch (error) {
+		console.error('Error:', error);
+		
+		return res.status(500).send({
+            message: false
+        });
+	}
 }

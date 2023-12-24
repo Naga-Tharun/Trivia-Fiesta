@@ -297,6 +297,7 @@
     ```
     {
         "message": true,
+        "creatorId": "64f1be92dfe3f9d4f19c73f5",
         "participants": [
             {
                 "_id": "64f1be92dfe3f9d4f19c73f5",
@@ -403,7 +404,61 @@
         ]
     }
     ```
-16. Sockets are created for `disconnect`, `joinRoom`, `startGame`
+16. baseurl/multi-player/room-details : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 23906,
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": true,
+        "participants": [
+            {
+                "_id": "64f1be92dfe3f9d4f19c73f5",
+                "email": "test@test.com",
+                "name": "test",
+                "username": "test"
+            },
+            {
+                "_id": "6555ada5e80f53e94325ce09",
+                "email": "test1@test.com",
+                "name": "test1",
+                "username": "test1"
+            }
+        ],
+        "categories": [
+            "Cars",
+            "Adventure"
+        ],
+        "playersReadyList": [],
+        "roomId": "23906"
+    }
+    ```
+17. baseurl/multi-player/check-all-player-ready : (POST)
+
+    Body:
+
+    ```
+    {
+        "token": "eefeibeifnidnodqdownfowfnwfoiwfjwfw....",
+        "roomId": 23906,
+    }
+    ```
+    Response:
+
+    ```
+    {
+        "message": false
+    }
+    ```
+18. Sockets are created for `disconnect`, `joinRoom`, `startGame`
 
     1. joinRoom requires: userId, roomId does not emit any response
     2. startGame requires: userId, roomId, numQuestions emits the questions for the game in the form of an array
@@ -485,7 +540,7 @@
 
     ```
 
-17. baseurl/multi-player/update-score : (POST)
+19. baseurl/multi-player/update-score : (POST)
 
     Body:
 
@@ -505,7 +560,7 @@
     }
     ```
 
-18. baseurl/multi-player/final-result : (POST)
+20. baseurl/multi-player/final-result : (POST)
 
     Body:
 
@@ -538,7 +593,7 @@
     }
     ```
 
-19. baseurl/multi-player/user-scores : (POST)
+21. baseurl/multi-player/user-scores : (POST)
 
     Body:
 
@@ -586,7 +641,7 @@
         }
     ]
     ```
-20. baseurl/team-player/create-room : (POST)
+22. baseurl/team-player/create-room : (POST)
 
     Body:
 
@@ -622,7 +677,7 @@
         "_id": "6583e27fdb54c1fbaf8e0de5"
     }
     ```
-21. baseurl/team-player/join-room : (POST)
+23. baseurl/team-player/join-room : (POST)
 
     Body:
 
@@ -662,7 +717,7 @@
         "roomId": "09180"
     }
     ```
-22. baseurl/team-player/leave-room : (POST)
+24. baseurl/team-player/leave-room : (POST)
 
     Body:
 
@@ -680,7 +735,7 @@
         "message": true
     }
     ```
-23. baseurl/team-player/update-categories : (POST)
+25. baseurl/team-player/update-categories : (POST)
 
     Body:
 
@@ -701,7 +756,7 @@
         ]
     }
     ```
-24. Sockets are created for `teamDisconnect`, `joinTeamRoom`, `startTeamGame`, `teamCategoryChoice`, `teamQuestionChoice`, `alterTeamTurn`
+26. Sockets are created for `teamDisconnect`, `joinTeamRoom`, `startTeamGame`, `teamCategoryChoice`, `teamQuestionChoice`, `alterTeamTurn`
 
     HTML file for running a http server to test the sockets (run it using `http-server`)
 
@@ -816,7 +871,7 @@
 
     ```
    
-25. baseurl/team-player/update-score : (POST)
+27. baseurl/team-player/update-score : (POST)
 
     Body:
 
@@ -879,7 +934,7 @@
     }
     ```
 
-26. baseurl/team-player/final-result : (POST)
+28. baseurl/team-player/final-result : (POST)
 
     Body:
 
@@ -921,7 +976,7 @@
         }
     }
     ```
-27. baseurl/team-player/check-answer : (POST)
+29. baseurl/team-player/check-answer : (POST)
 
     Body:
 

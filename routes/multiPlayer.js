@@ -23,4 +23,8 @@ router.post('/final-result', auth, multiPlayersController.finalResult);
 
 router.post('/user-scores', auth, multiPlayersController.userScores);
 
+router.post('/room-details', auth, multiPlayersController.roomDetails);
+
+router.post('/check-all-player-ready', auth, multiPlayersController.checkAllPlayerReady);
+
 module.exports = router;
